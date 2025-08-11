@@ -1,0 +1,3 @@
+#!/bin/bash
+# Clean SSH access without host key warnings
+ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null -o LogLevel=ERROR claude@localhost -p 5222 "$@"

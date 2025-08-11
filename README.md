@@ -32,10 +32,24 @@ This project creates a **portable development environment** where you can:
 
 ```bash
 git clone <your-repo-url>
-cd claude-docker
+cd mobile-ai-agent
 ```
 
-### 2. Set Up Environment Variables
+### 2. New Machine Setup (Prevents SSH Issues)
+
+**On a fresh machine, run this first:**
+```bash
+./scripts/setup-new-machine.sh
+```
+
+This script will:
+- ✅ Set up SSH config to auto-accept host keys
+- ✅ Create .env file from example
+- ✅ Set proper permissions on SSH keys
+- ✅ Test SSH connection
+- ✅ Prevent host key verification warnings
+
+### 3. Set Up Environment Variables
 
 Copy the example environment file and add your API keys:
 
@@ -53,7 +67,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TS_AUTHKEY=tskey-auth-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### 3. Run Setup Script
+### 4. Run Setup Script
 
 **On Linux/Mac:**
 ```bash
@@ -78,10 +92,10 @@ This script will:
 | Access Method | Command |
 |---------------|---------|
 | **Local (Key)** | `./ssh-claude` or `ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222` |
-| **Local (Password)** | `./ssh-password` or `ssh claude@localhost -p 5222` (password: `claude`) |
-| **Remote (Key)** | `./ssh-claude --host 100.64.246.92` or `ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222` |
-| **Remote (Password)** | `./ssh-password 100.64.246.92` or `ssh claude@100.64.246.92 -p 5222` (password: `claude`) |
-| **Mobile** | Use Termius app with `ssh claude@100.64.246.92 -p 5222` (password: `claude`) |
+| **Local (Password)** | `./ssh-password localhost 5222` or `ssh claude@localhost -p 5222` (password: `claude`) |
+| **Remote (Key)** | `./ssh-claude --host 100.82.56.81` or `ssh -i workspace/ssh-keys/id_ed25519 claude@100.82.56.81 -p 5222` |
+| **Remote (Password)** | `./ssh-password 100.82.56.81` or `ssh claude@100.82.56.81 -p 5222` (password: `claude`) |
+| **Mobile** | Use Termius app with `ssh claude@100.82.56.81 -p 5222` (password: `claude`) |
 
 ## 🔗 How to Connect
 
@@ -506,5 +520,63 @@ If you encounter issues:
 4. Ensure Docker has sufficient resources (CPU, memory, disk)
 
 ---
+
+## 🔧 Troubleshooting
+
+### SSH Host Key Issues
+If you see "REMOTE HOST IDENTIFICATION HAS CHANGED" warnings:
+
+**Quick Fix:**
+```bash
+# Remove old host keys
+ssh-keygen -R "[localhost]:5222"
+ssh-keygen -R "[100.82.56.81]:5222"
+
+# Use clean SSH commands
+./ssh-clean
+./ssh-password localhost 5222
+```
+
+**Prevention:**
+```bash
+# Run on new machines to prevent issues
+./scripts/setup-new-machine.sh
+```
+
+### Connection Refused
+If you get "Connection refused":
+
+1. **Check if container is running:**
+   ```bash
+   docker ps | grep claude
+   ```
+
+2. **Start container:**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Check logs:**
+   ```bash
+   docker-compose logs claude-cli
+   ```
+
+### Tailscale Not Connected
+If remote access doesn't work:
+
+1. **Check host Tailscale:**
+   ```bash
+   tailscale status
+   ```
+
+2. **Check container Tailscale:**
+   ```bash
+   ./ssh-password localhost 5222 "tailscale status"
+   ```
+
+3. **Add TS_AUTHKEY to .env and restart:**
+   ```bash
+   docker-compose restart
+   ```
 
 **Happy coding with Claude! 🚀📱** 

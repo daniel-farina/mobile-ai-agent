@@ -85,8 +85,8 @@ print_info "User: $USER"
 print_info "SSH Key: $SSH_KEY"
 echo ""
 
-# Build SSH command
-SSH_CMD="ssh -i '$SSH_KEY' -p $PORT -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null $USER@$HOST"
+# Build SSH command with automatic host key acceptance and no warnings
+SSH_CMD="ssh -i '$SSH_KEY' -p $PORT -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o GlobalKnownHostsFile=/dev/null $USER@$HOST"
 
 # If additional arguments provided, run command and exit
 if [ $# -gt 0 ]; then
