@@ -1,0 +1,32 @@
+services:
+  claude-cli:
+    build: .
+    container_name: claude-cli-container
+    ports:
+      - "2222:22"  # Map container SSH port to host port 2222
+      - "3000:3000"  # Common web app port
+      - "3001:3001"  # Additional web app port
+      - "3002:3002"  # Additional web app port
+      - "3003:3003"  # Additional web app port
+      - "3004:3004"  # Additional web app port
+      - "3005:3005"  # Additional web app port
+      - "8000:8000"  # Python/Django port
+      - "8080:8080"  # Alternative web port
+      - "5000:5000"  # Flask port
+    volumes:
+      - ./workspace:/home/claude/workspace  # Mount workspace for persistent data
+      - ./claude-config:/home/claude/.claude  # Mount Claude configuration and state
+      - ./workspace/.ssh:/home/claude/.ssh:ro  # Mount SSH keys from workspace
+      - ./tailscale-config:/var/lib/tailscale  # Persistent Tailscale config
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}  # Pass API key from environment
+      - TS_AUTHKEY=${TS_AUTHKEY}  # Tailscale auth key
+    cap_add:
+      - NET_ADMIN  # Required for Tailscale
+    restart: unless-stopped
+    networks:
+      - claude-network
+
+networks:
+  claude-network:
+    driver: bridge 
