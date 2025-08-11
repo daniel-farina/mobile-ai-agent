@@ -19,6 +19,7 @@ services:
       - ./workspace/ssh-keys:/home/claude/.ssh  # Mount SSH keys from workspace
       - ./tailscale-config:/var/lib/tailscale  # Persistent Tailscale config
       - ./CLAUDE.md:/home/claude/workspace/CLAUDE.md  # Mount project memory file
+      - ./CLAUDE.md:/home/claude/.claude/CLAUDE.md  # Mount project memory file to Claude config
       - ./ssh-host-keys:/etc/ssh/host-keys  # Persistent SSH host keys
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}  # Pass API key from environment
