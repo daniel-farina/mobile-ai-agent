@@ -187,9 +187,9 @@ tailscale-state/
 claude-config/
 .claude/
 
-# Workspace (user data)
-workspace/
-!workspace/.gitkeep
+# Workspace (user data) - Now committed to repo
+# workspace/
+# !workspace/.gitkeep
 
 # Test files
 test-*.js
