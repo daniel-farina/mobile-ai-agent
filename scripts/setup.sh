@@ -92,6 +92,9 @@ setup_ssh_keys() {
     cp ~/.ssh/id_rsa.pub workspace/.ssh/authorized_keys
     chmod 600 workspace/.ssh/authorized_keys
     
+    # Create SSH host keys directory
+    mkdir -p ssh-host-keys
+    
     print_status "SSH keys configured"
 }
 
@@ -130,26 +133,57 @@ show_connection_info() {
     # Wait a bit more for Tailscale to connect
     sleep 5
     
+    # Get local IP address
+    LOCAL_IP=$(ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}' | head -1)
+    
+    # Get Docker container IP
+    DOCKER_IP=$(docker inspect claude-cli-container | grep '"IPAddress"' | head -1 | awk -F'"' '{print $4}')
+    
     # Get Tailscale IP
     TAILSCALE_IP=$(docker exec claude-cli-container tailscale ip 2>/dev/null | head -1 || echo "Connecting...")
+    
+    # Get Tailscale status
+    TAILSCALE_STATUS=$(docker exec claude-cli-container tailscale status 2>/dev/null | head -1 || echo "Not connected")
     
     echo ""
     echo "🎉 Setup Complete!"
     echo ""
     echo "📋 Connection Information:"
-    echo "  SSH Access: ssh claude@$TAILSCALE_IP"
-    echo "  Web Apps: http://$TAILSCALE_IP:3000 (and other ports)"
+    echo ""
+    echo "🌐 Local Access (from this machine):"
+    echo "  SSH: ssh claude@localhost -p 5222"
+    echo "  Web Apps: http://localhost:5300 (React/Node.js)"
+    echo "            http://localhost:5500 (Flask)"
+    echo "            http://localhost:5800 (Django)"
+    echo ""
+    echo "🐳 Docker Network Access:"
+    echo "  SSH: ssh claude@$DOCKER_IP"
+    echo "  Web Apps: http://$DOCKER_IP:3000 (React/Node.js)"
+    echo "            http://$DOCKER_IP:5000 (Flask)"
+    echo "            http://$DOCKER_IP:8000 (Django)"
+    echo ""
+    echo "🔗 Tailscale Network Access (for mobile/remote):"
+    echo "  Status: $TAILSCALE_STATUS"
+    if [ "$TAILSCALE_IP" != "Connecting..." ]; then
+        echo "  SSH: ssh claude@$TAILSCALE_IP -p 5222"
+        echo "  Web Apps: http://$TAILSCALE_IP:5300 (React/Node.js)"
+        echo "            http://$TAILSCALE_IP:5500 (Flask)"
+        echo "            http://$TAILSCALE_IP:5800 (Django)"
+    else
+        echo "  ⏳ Tailscale is connecting... (check logs: docker-compose logs claude-cli)"
+    fi
     echo ""
     echo "📱 iPhone Access:"
     echo "  1. Install Tailscale from App Store"
-    echo "  2. SSH: Use Termius app with the IP above"
-    echo "  3. Web: Open Safari and go to http://$TAILSCALE_IP:3000"
+    echo "  2. SSH: Use Termius app with the Tailscale IP above"
+    echo "  3. Web: Open Safari and go to http://$TAILSCALE_IP:5300"
     echo ""
     echo "🔧 Useful Commands:"
     echo "  View logs: docker-compose logs claude-cli"
     echo "  Stop container: docker-compose down"
     echo "  Restart container: docker-compose restart"
-    echo "  SSH into container: ssh claude@$TAILSCALE_IP"
+    echo "  Check Tailscale: docker exec claude-cli-container tailscale status"
+    echo "  SSH into container: ssh claude@localhost -p 5222"
     echo ""
     echo "🚀 Your Claude CLI Container is ready!"
 }

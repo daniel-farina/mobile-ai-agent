@@ -78,16 +78,16 @@ This script will:
 ### SSH Access
 ```bash
 # From any device on your Tailscale network
-ssh claude@100.64.246.92
+ssh claude@100.64.246.92 -p 5222
 # No password required! (Uses SSH keys)
 ```
 
 ### Web App Access
 ```bash
 # Your web apps will be available at:
-http://100.64.246.92:3000  # React/Node.js apps
-http://100.64.246.92:5000  # Flask apps  
-http://100.64.246.92:8000  # Django apps
+http://100.64.246.92:5300  # React/Node.js apps
+http://100.64.246.92:5500  # Flask apps  
+http://100.64.246.92:5800  # Django apps
 ```
 
 ## 📱 iPhone Access
@@ -121,7 +121,7 @@ npm start
 ```
 
 ### Step 3: Access from iPhone
-Open Safari and go to: `http://100.64.246.92:3000`
+Open Safari and go to: `http://100.64.246.92:5300`
 
 **That's it!** Your React app is now accessible from your iPhone through Tailscale's secure network.
 
@@ -151,11 +151,11 @@ The container exposes these ports for web applications:
 
 | Port | Framework | Example Use |
 |------|-----------|-------------|
-| 3000 | React/Next.js | `npm start` |
-| 3001-3005 | Additional apps | Custom Node.js apps |
-| 5000 | Flask | `python app.py` |
-| 8000 | Django | `python manage.py runserver 0.0.0.0:8000` |
-| 8080 | Alternative | Any web server |
+| 5300 | React/Next.js | `npm start` |
+| 5301-5305 | Additional apps | Custom Node.js apps |
+| 5500 | Flask | `python app.py` |
+| 5800 | Django | `python manage.py runserver 0.0.0.0:8000` |
+| 5808 | Alternative | Any web server |
 
 ## 📁 Project Structure
 
