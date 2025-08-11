@@ -16,7 +16,7 @@ services:
     volumes:
       - ./workspace:/home/claude/workspace  # Mount workspace for persistent data
       - ./claude-config:/home/claude/.claude  # Mount Claude configuration and state
-      - ./workspace/.ssh:/home/claude/.ssh:ro  # Mount SSH keys from workspace
+      - ./workspace/ssh-keys:/home/claude/.ssh  # Mount SSH keys from workspace
       - ./tailscale-config:/var/lib/tailscale  # Persistent Tailscale config
       - ./CLAUDE.md:/home/claude/workspace/CLAUDE.md  # Mount project memory file
       - ./ssh-host-keys:/etc/ssh/host-keys  # Persistent SSH host keys

@@ -75,11 +75,19 @@ This script will:
 
 ## 🔗 How to Connect
 
-### SSH Access
+### SSH Access (Self-Contained)
 ```bash
-# From any device on your Tailscale network
-ssh claude@100.64.246.92 -p 5222
-# No password required! (Uses SSH keys)
+# Local access (uses repository SSH keys only)
+./ssh-claude
+
+# Remote access via Tailscale
+./ssh-claude --host 100.64.246.92
+
+# Run commands directly
+./ssh-claude "pm2 status"
+./ssh-claude --host 100.64.246.92 "whoami"
+
+# No external SSH config needed - everything is in the repository!
 ```
 
 ### Web App Access

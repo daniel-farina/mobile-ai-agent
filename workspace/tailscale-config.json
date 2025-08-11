@@ -1,0 +1,17 @@
+{
+  "hostIP": "100.82.56.81",
+  "containerIP": null,
+  "status": "host_only",
+  "lastUpdated": "2025-08-11T18:30:00Z",
+  "setupComplete": true,
+  "accessUrls": {
+    "welcomeApp": "http://100.82.56.81:5300",
+    "reactApp": "http://100.82.56.81:5301",
+    "flaskApp": "http://100.82.56.81:5500",
+    "djangoApp": "http://100.82.56.81:5800"
+  },
+  "sshAccess": {
+    "host": "ssh claude@100.82.56.81 -p 5222",
+    "container": null
+  }
+}

@@ -13,7 +13,6 @@
 # Docker and container data
 tailscale-config/
 claude-config/
-workspace/
 logs/
 
 # Container configuration (contains sensitive data)
