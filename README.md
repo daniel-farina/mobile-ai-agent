@@ -73,9 +73,19 @@ This script will:
 - ✅ Build and start the container
 - ✅ Display connection information
 
+## 🔑 Quick SSH Reference
+
+| Access Method | Command |
+|---------------|---------|
+| **Local** | `./ssh-claude` or `ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222` |
+| **Remote** | `./ssh-claude --host 100.64.246.92` or `ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222` |
+| **Mobile** | Use Termius app with `ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222` |
+
 ## 🔗 How to Connect
 
-### SSH Access (Self-Contained)
+### SSH Access
+
+#### **Self-Contained (Recommended)**
 ```bash
 # Local access (uses repository SSH keys only)
 ./ssh-claude
@@ -86,8 +96,25 @@ This script will:
 # Run commands directly
 ./ssh-claude "pm2 status"
 ./ssh-claude --host 100.64.246.92 "whoami"
+```
 
-# No external SSH config needed - everything is in the repository!
+#### **Standard SSH Commands**
+```bash
+# Local access
+ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222
+
+# Remote access via Tailscale
+ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+
+# Mobile access (from any device on Tailscale network)
+ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+```
+
+#### **SSH Key Location**
+```bash
+# Private key: workspace/ssh-keys/id_ed25519
+# Public key: workspace/ssh-keys/id_ed25519.pub
+# All keys are included in the repository
 ```
 
 ### Web App Access
@@ -104,9 +131,17 @@ http://100.64.246.92:5800  # Django apps
 1. Install **Termius** from App Store
 2. Add new SSH connection:
    - Host: `100.64.246.92`
+   - Port: `5222`
    - Username: `claude`
-   - Authentication: SSH Key (import your private key)
+   - Authentication: SSH Key
+   - Private Key: Import `workspace/ssh-keys/id_ed25519`
 3. Connect and start coding!
+
+**Alternative SSH Commands for Termius:**
+```bash
+# Standard SSH command for Termius
+ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+```
 
 ### Web App Access from iPhone
 1. Open **Safari**
@@ -117,7 +152,13 @@ http://100.64.246.92:5800  # Django apps
 
 ### Step 1: SSH into Container
 ```bash
-ssh claude@100.64.246.92
+# Using self-contained script (recommended)
+./ssh-claude --host 100.64.246.92
+
+# Or using standard SSH command
+ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+
+# Then navigate to workspace
 cd /home/claude/workspace
 ```
 
