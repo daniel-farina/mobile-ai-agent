@@ -35,21 +35,9 @@ git clone <your-repo-url>
 cd mobile-ai-agent
 ```
 
-### 2. New Machine Setup (Prevents SSH Issues)
 
-**On a fresh machine, run this first:**
-```bash
-./scripts/setup-new-machine.sh
-```
 
-This script will:
-- ✅ Set up SSH config to auto-accept host keys
-- ✅ Create .env file from example
-- ✅ Set proper permissions on SSH keys
-- ✅ Test SSH connection
-- ✅ Prevent host key verification warnings
-
-### 3. Set Up Environment Variables
+### 2. Set Up Environment Variables
 
 Copy the example environment file and add your API keys:
 
@@ -67,7 +55,7 @@ ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TS_AUTHKEY=tskey-auth-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### 4. Run Setup Script
+### 3. Run Setup Script
 
 **On Linux/Mac:**
 ```bash
@@ -83,7 +71,8 @@ chmod +x scripts/setup.sh
 This script will:
 - ✅ Check Docker installation
 - ✅ Validate environment variables
-- ✅ Set up SSH keys automatically
+- ✅ Set up repository SSH keys automatically
+- ✅ Configure SSH host key handling (prevents warnings)
 - ✅ Build and start the container
 - ✅ Display connection information
 
@@ -539,8 +528,8 @@ ssh-keygen -R "[100.82.56.81]:5222"
 
 **Prevention:**
 ```bash
-# Run on new machines to prevent issues
-./scripts/setup-new-machine.sh
+# The main setup script now handles this automatically
+./scripts/setup.sh
 ```
 
 ### Connection Refused

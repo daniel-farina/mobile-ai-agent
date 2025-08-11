@@ -76,21 +76,56 @@ check_env() {
 setup_ssh_keys() {
     print_info "Setting up SSH keys for passwordless access..."
     
-    # Check if SSH keys exist
-    if [ ! -f ~/.ssh/id_rsa ]; then
-        print_info "Creating new SSH key..."
-        ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N "" -C "claude-cli-container"
-        print_status "SSH key created"
+    # Check if repository SSH keys exist, if not generate them
+    if [ ! -f "workspace/ssh-keys/id_ed25519" ]; then
+        print_info "Creating repository SSH keys..."
+        mkdir -p workspace/ssh-keys
+        ssh-keygen -t ed25519 -f workspace/ssh-keys/id_ed25519 -N "" -C "mobile-ai-agent@$(hostname)"
+        cp workspace/ssh-keys/id_ed25519.pub workspace/ssh-keys/authorized_keys
+        print_status "Repository SSH keys created"
     else
-        print_status "SSH key already exists"
+        print_status "Repository SSH keys already exist"
     fi
     
-    # Create workspace/.ssh directory
-    mkdir -p workspace/.ssh
+    # Set up SSH host key handling to prevent warnings
+    print_info "Setting up SSH host key handling..."
     
-    # Copy public key to workspace
-    cp ~/.ssh/id_rsa.pub workspace/.ssh/authorized_keys
-    chmod 600 workspace/.ssh/authorized_keys
+    # Create SSH config to prevent host key warnings
+    SSH_CONFIG_DIR="$HOME/.ssh"
+    SSH_CONFIG_FILE="$SSH_CONFIG_DIR/config"
+    
+    # Create .ssh directory if it doesn't exist
+    mkdir -p "$SSH_CONFIG_DIR"
+    
+    # Add configuration for mobile-ai-agent to prevent host key warnings
+    if [ ! -f "$SSH_CONFIG_FILE" ]; then
+        touch "$SSH_CONFIG_FILE"
+        chmod 600 "$SSH_CONFIG_FILE"
+    fi
+    
+    # Add mobile-ai-agent configuration if not already present
+    if ! grep -q "mobile-ai-agent" "$SSH_CONFIG_FILE"; then
+        cat >> "$SSH_CONFIG_FILE" << 'EOF'
+
+# Mobile AI Agent - Auto-accept host keys
+Host localhost
+    Port 5222
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking accept-new
+    GlobalKnownHostsFile /dev/null
+    LogLevel ERROR
+
+Host 100.*
+    Port 5222
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking accept-new
+    GlobalKnownHostsFile /dev/null
+    LogLevel ERROR
+EOF
+        print_status "SSH config updated to auto-accept host keys"
+    else
+        print_status "SSH config already configured"
+    fi
     
     # Create SSH host keys directory
     mkdir -p ssh-host-keys
@@ -154,7 +189,9 @@ show_connection_info() {
     echo "📋 Connection Information:"
     echo ""
     echo "🌐 Local Access (from this machine):"
-    echo "  SSH: ssh claude@localhost -p 5222"
+    echo "  SSH (Key): ./ssh-claude"
+    echo "  SSH (Password): ./ssh-password localhost 5222"
+    echo "  SSH (Clean): ./ssh-clean"
     echo "  Web Apps: http://localhost:5300 (Welcome App)"
     echo "            http://localhost:5301 (React/Node.js)"
     echo "            http://localhost:5500 (Flask)"
@@ -172,7 +209,8 @@ show_connection_info() {
     echo "  Container Status: $TAILSCALE_STATUS"
     if [ "$TAILSCALE_IP" != "Connecting..." ]; then
         echo "  Container IP: $TAILSCALE_IP"
-        echo "  SSH: ssh claude@$HOST_TAILSCALE_IP -p 5222"
+        echo "  SSH (Key): ./ssh-claude --host $HOST_TAILSCALE_IP"
+        echo "  SSH (Password): ./ssh-password $HOST_TAILSCALE_IP"
         echo "  Web Apps: http://$HOST_TAILSCALE_IP:5300 (Welcome App)"
         echo "            http://$HOST_TAILSCALE_IP:5301 (React/Node.js)"
         echo "            http://$HOST_TAILSCALE_IP:5500 (Flask)"
