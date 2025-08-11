@@ -25,7 +25,8 @@ RUN npm install -g pm2
 
 # Create a user for SSH access
 RUN useradd -m -s /bin/bash claude && \
-    usermod -aG sudo claude
+    usermod -aG sudo claude && \
+    echo "claude:claude" | chpasswd
 
 # Create SSH directory and set permissions for claude user
 RUN mkdir -p /home/claude/.ssh && \
@@ -34,9 +35,9 @@ RUN mkdir -p /home/claude/.ssh && \
     chmod 600 /home/claude/.ssh/authorized_keys && \
     chown -R claude:claude /home/claude/.ssh
 
-# Configure SSH for key-based authentication only
+# Configure SSH for both key-based and password authentication
 RUN mkdir -p /var/run/sshd && \
-    echo "PasswordAuthentication no" >> /etc/ssh/sshd_config && \
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config && \
     echo "PermitRootLogin no" >> /etc/ssh/sshd_config && \
     echo "AllowUsers claude" >> /etc/ssh/sshd_config && \
     echo "PubkeyAuthentication yes" >> /etc/ssh/sshd_config && \

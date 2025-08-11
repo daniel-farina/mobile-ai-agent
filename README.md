@@ -77,9 +77,11 @@ This script will:
 
 | Access Method | Command |
 |---------------|---------|
-| **Local** | `./ssh-claude` or `ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222` |
-| **Remote** | `./ssh-claude --host 100.64.246.92` or `ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222` |
-| **Mobile** | Use Termius app with `ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222` |
+| **Local (Key)** | `./ssh-claude` or `ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222` |
+| **Local (Password)** | `./ssh-password` or `ssh claude@localhost -p 5222` (password: `claude`) |
+| **Remote (Key)** | `./ssh-claude --host 100.64.246.92` or `ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222` |
+| **Remote (Password)** | `./ssh-password 100.64.246.92` or `ssh claude@100.64.246.92 -p 5222` (password: `claude`) |
+| **Mobile** | Use Termius app with `ssh claude@100.64.246.92 -p 5222` (password: `claude`) |
 
 ## 🔗 How to Connect
 
@@ -100,14 +102,17 @@ This script will:
 
 #### **Standard SSH Commands**
 ```bash
-# Local access
+# Local access (with warnings)
 ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222
 
-# Remote access via Tailscale
-ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+# Local access (clean, no warnings)
+ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@localhost -p 5222
+
+# Remote access via Tailscale (clean)
+ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@100.64.246.92 -p 5222
 
 # Mobile access (from any device on Tailscale network)
-ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@100.64.246.92 -p 5222
 ```
 
 #### **SSH Key Location**
@@ -115,6 +120,22 @@ ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
 # Private key: workspace/ssh-keys/id_ed25519
 # Public key: workspace/ssh-keys/id_ed25519.pub
 # All keys are included in the repository
+```
+
+#### **Password Authentication**
+```bash
+# Username: claude
+# Password: claude
+# Works with any SSH client (Termius, PuTTY, etc.)
+
+# Simple password-based access
+./ssh-password                    # Local access
+./ssh-password 100.64.246.92      # Remote access
+./ssh-password 100.64.246.92 5222 # Custom port
+
+# Standard SSH with password
+ssh claude@localhost -p 5222      # Will prompt for password: claude
+ssh claude@100.64.246.92 -p 5222  # Will prompt for password: claude
 ```
 
 ### Web App Access
@@ -133,13 +154,17 @@ http://100.64.246.92:5800  # Django apps
    - Host: `100.64.246.92`
    - Port: `5222`
    - Username: `claude`
-   - Authentication: SSH Key
-   - Private Key: Import `workspace/ssh-keys/id_ed25519`
+   - Authentication: **Password** (easier) or **SSH Key**
+   - Password: `claude`
 3. Connect and start coding!
 
-**Alternative SSH Commands for Termius:**
+**SSH Commands for Termius:**
 ```bash
-# Standard SSH command for Termius
+# Password authentication (easier)
+ssh claude@100.64.246.92 -p 5222
+# Password: claude
+
+# SSH key authentication (more secure)
 ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
 ```
 
