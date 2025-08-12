@@ -16,18 +16,14 @@ You are running inside a **Docker container** that serves as a **Mobile AI Agent
 ## 🌐 **Network Access**
 
 ### **Port Mappings (Host → Container):**
-| Host Port | Container Port | Purpose | Framework |
-|-----------|----------------|---------|-----------|
-| 5222 | 22 | SSH Access | - |
-| 5300 | 3000 | React/Node.js Apps | React, Next.js, Express |
-| 5301 | 3001 | Additional Apps | Custom Node.js |
-| 5302 | 3002 | Additional Apps | Custom Node.js |
-| 5303 | 3003 | Additional Apps | Custom Node.js |
-| 5304 | 3004 | Additional Apps | Custom Node.js |
-| 5305 | 3005 | Additional Apps | Custom Node.js |
-| 5500 | 5000 | Flask Apps | Python Flask |
-| 5800 | 8000 | Django Apps | Python Django |
-| 5808 | 8080 | Alternative Web | Any web server |
+| Host Port | Container Port | Purpose | Status |
+|-----------|----------------|---------|---------|
+| 5222 | 22 | SSH Access | Always Available |
+| 5300 | 3000 | Welcome App (PM2 Management) | Always Running |
+| 5301-5320 | 3001-3020 | Additional Apps | Available for New Apps |
+| 5500 | 5000 | Flask Apps | Available for Python Apps |
+| 5800 | 8000 | Django Apps | Available for Python Apps |
+| 5808 | 8080 | Alternative Web | Available for Any Web Server |
 
 ### **Access URLs:**
 - **Local Access**: `http://localhost:5300` (from host machine)
@@ -111,31 +107,34 @@ module.exports = {
 ## 🛠️ **Development Workflow**
 
 ### **1. Creating New Projects:**
+**IMPORTANT**: Always use unique ports for each app. Port 5300 is reserved for the Welcome App.
+
 ```bash
-# React App (with hot reload)
+# React App (with hot reload) - Use port 5301
 npx create-react-app projects/react-app
 cd projects/react-app
-pm2 start npm --name "react-app" -- start
+# Update package.json to use port 3001 (maps to host 5301)
+pm2 start npm --name "react-app" -- start -- --port 3001
 
-# Next.js App (with hot reload)
+# Next.js App (with hot reload) - Use port 5302
 npx create-next-app@latest projects/next-app
 cd projects/next-app
-pm2 start npm --name "next-app" -- run dev
+# Update next.config.js to use port 3002 (maps to host 5302)
+pm2 start npm --name "next-app" -- run dev -- --port 3002
 
-# Express App (with hot reload)
+# Express App (with hot reload) - Use port 5303
 mkdir -p projects/express-app && cd projects/express-app
 npm init -y && npm install express nodemon
-# Create app.js and package.json with dev script
+# Create app.js with PORT=3003 and package.json with dev script
 pm2 start npm --name "express-app" -- run dev
-```
 
-# Flask App
+# Flask App - Use port 5500
 mkdir -p projects/flask-app
 cd projects/flask-app
-# Create app.py and requirements.txt
+# Create app.py with app.run(host='0.0.0.0', port=5000)
 pm2 start app.py --name "flask-app" --interpreter python3
 
-# Django App
+# Django App - Use port 5800
 django-admin startproject django-app projects/django-app
 cd projects/django-app
 pm2 start manage.py --name "django-app" -- runserver 0.0.0.0:8000
@@ -160,10 +159,12 @@ pm2 logs react-app
 - **Always use PM2** for process management
 - **Use `npm run dev`** for hot reloading during development
 - **Bind to 0.0.0.0** for external access
-- **Use the correct ports** (3000 for React/Next.js, 5000 for Flask, 8000 for Django)
+- **Use unique ports** for each app (5301-5320 for Node.js apps, 5500 for Flask, 5800 for Django)
+- **Port 5300 is reserved** for the Welcome App - never use it for new apps
 - **Save PM2 configuration** after setup
 - **Monitor app health** regularly
 - **Enable file watching** for automatic reloads
+- **Check port availability** before starting new apps
 
 ## 🔧 **Available Tools & Commands**
 
@@ -252,17 +253,21 @@ ssh claude@localhost -p 5222
 # View PM2 processes
 pm2 list
 
-# Start a new React app
-npx create-react-app my-app && cd my-app && pm2 start npm --name "my-app" -- start
+# Start a new React app (use unique port)
+npx create-react-app my-app && cd my-app && pm2 start npm --name "my-app" -- start -- --port 3001
 
 # Test web app access
-curl http://localhost:5300
+curl http://localhost:5300  # Welcome App
+curl http://localhost:5301  # Your new app
 
 # View container logs
 docker-compose logs claude-cli
 
 # Check Tailscale status
 tailscale status
+
+# Check available ports
+netstat -tulpn | grep LISTEN
 ```
 
 ## 🎉 **Ready to Code!**
