@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=UTC
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     wget \
     git \
@@ -14,11 +14,40 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     build-essential \
-    && rm -rf /var/lib/apt/lists/*
+    less \
+    procps \
+    fzf \
+    zsh \
+    man-db \
+    unzip \
+    gnupg2 \
+    iptables \
+    ipset \
+    iproute2 \
+    dnsutils \
+    jq \
+    nano \
+    vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives/*
 
 # Install Node.js 18 (LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives/*
+
+# Install GitHub CLI
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends gh \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/archives/*
 
 # Install PM2 globally for process management
 RUN npm install -g pm2
@@ -69,6 +98,11 @@ RUN chown -R claude:claude /home/claude/.claude
 # Configure bash profile to auto-launch Claude
 RUN echo '#!/bin/bash\n\
 # Mobile AI Agent - Auto-launch Claude CLI\n\
+\n\
+# Source aliases file if it exists\n\
+if [ -f "/home/claude/workspace/bash-aliases.sh" ]; then\n\
+    source /home/claude/workspace/bash-aliases.sh\n\
+fi\n\
 \n\
 # Set up aliases for easy access\n\
 alias bash-shell="exec bash"\n\
