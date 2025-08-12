@@ -63,6 +63,9 @@ USER claude
 # Create Claude configuration directory
 RUN mkdir -p /home/claude/.claude
 
+# Set proper permissions for Claude config
+RUN chown -R claude:claude /home/claude/.claude
+
 # Configure bash profile to auto-launch Claude
 RUN echo '#!/bin/bash\n\
 # Mobile AI Agent - Auto-launch Claude CLI\n\
@@ -117,61 +120,9 @@ fi' > /home/claude/auto-claude.sh && chmod +x /home/claude/auto-claude.sh
 # Switch back to root for SSH service
 USER root
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-\n\
-# Setup persistent SSH host keys\n\
-if [ ! -f /etc/ssh/ssh_host_rsa_key ]; then\n\
-    echo "Generating SSH host keys..."\n\
-    ssh-keygen -A\n\
-    if [ -d /etc/ssh/host-keys ]; then\n\
-        cp /etc/ssh/ssh_host_* /etc/ssh/host-keys/\n\
-    fi\n\
-elif [ -d /etc/ssh/host-keys ]; then\n\
-    echo "Using persistent SSH host keys..."\n\
-    cp /etc/ssh/host-keys/ssh_host_* /etc/ssh/\n\
-    chmod 600 /etc/ssh/ssh_host_*\n\
-fi\n\
-\n\
-# Start Tailscale\n\
-if [ ! -z "$TS_AUTHKEY" ]; then\n\
-    echo "Starting Tailscale..."\n\
-    tailscaled --tun=userspace-networking --socks5-server=localhost:1055 &\n\
-    sleep 2\n\
-    tailscale up --authkey=$TS_AUTHKEY --hostname=claude-cli-container\n\
-    echo "Tailscale IP: $(tailscale ip)"\n\
-else\n\
-    echo "No Tailscale auth key provided, skipping Tailscale setup"\n\
-fi\n\
-\n\
-# Setup and start PM2 with welcome app\n\
-echo "Setting up PM2 and welcome app..."\n\
-cd /home/claude/workspace\n\
-\n\
-# Install dependencies for welcome app\n\
-if [ -d "./projects/welcome-app" ]; then\n\
-    echo "Installing welcome app dependencies..."\n\
-    su - claude -c "cd /home/claude/workspace/projects/welcome-app && npm install"\n\
-fi\n\
-\n\
-# Setup PM2 startup script\n\
-echo "Setting up PM2 startup..."\n\
-su - claude -c "pm2 startup"\n\
-\n\
-# Start PM2 processes\n\
-echo "Starting PM2 processes..."\n\
-if [ -f "ecosystem.config.js" ]; then\n\
-    su - claude -c "cd /home/claude/workspace && pm2 start ecosystem.config.js --env development"\n\
-    echo "PM2 processes started successfully"\n\
-    su - claude -c "pm2 list"\n\
-else\n\
-    echo "ecosystem.config.js not found, starting welcome app manually..."\n\
-    su - claude -c "cd /home/claude/workspace/projects/welcome-app && pm2 start server.js --name welcome-app"\n\
-fi\n\
-\n\
-# Start SSH service\n\
-echo "Starting SSH service..."\n\
-exec /usr/sbin/sshd -D' > /startup.sh && chmod +x /startup.sh
+# Copy startup script
+COPY startup.sh /startup.sh
+RUN chmod +x /startup.sh
 
 # Expose SSH port
 EXPOSE 22
