@@ -146,7 +146,28 @@ fi\n\
 \n\
 # Setup and start PM2 with welcome app\n\
 echo "Setting up PM2 and welcome app..."\n\
-su - claude -c "cd /home/claude/workspace && pm2 startup && pm2 start ecosystem.config.js --env development || true"\n\
+cd /home/claude/workspace\n\
+\n\
+# Install dependencies for welcome app\n\
+if [ -d "./projects/welcome-app" ]; then\n\
+    echo "Installing welcome app dependencies..."\n\
+    su - claude -c "cd /home/claude/workspace/projects/welcome-app && npm install"\n\
+fi\n\
+\n\
+# Setup PM2 startup script\n\
+echo "Setting up PM2 startup..."\n\
+su - claude -c "pm2 startup"\n\
+\n\
+# Start PM2 processes\n\
+echo "Starting PM2 processes..."\n\
+if [ -f "ecosystem.config.js" ]; then\n\
+    su - claude -c "cd /home/claude/workspace && pm2 start ecosystem.config.js --env development"\n\
+    echo "PM2 processes started successfully"\n\
+    su - claude -c "pm2 list"\n\
+else\n\
+    echo "ecosystem.config.js not found, starting welcome app manually..."\n\
+    su - claude -c "cd /home/claude/workspace/projects/welcome-app && pm2 start server.js --name welcome-app"\n\
+fi\n\
 \n\
 # Start SSH service\n\
 echo "Starting SSH service..."\n\
