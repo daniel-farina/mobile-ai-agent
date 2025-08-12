@@ -45,13 +45,14 @@ Copy the example environment file and add your API keys:
 cp env.example .env
 ```
 
-Edit `.env` with your actual keys:
+Edit `.env` with your Tailscale auth key:
 
 ```bash
-# Claude CLI Configuration
+# Claude CLI Configuration (Optional)
+# Claude CLI will prompt for login when first used
 ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Tailscale Configuration  
+# Tailscale Configuration (Required for remote access)
 TS_AUTHKEY=tskey-auth-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
@@ -392,13 +393,13 @@ docker exec claude-cli-container tailscale ip
 ssh claude@localhost -p 2222
 ```
 
-### API Key Issues
+### Claude CLI Authentication
 ```bash
 # Test Claude CLI
 docker exec claude-cli-container claude --help
 
-# Check environment variable
-docker exec claude-cli-container env | grep ANTHROPIC_API_KEY
+# Claude CLI will prompt for login when first used
+# No need to set ANTHROPIC_API_KEY in .env
 ```
 
 ### Tailscale Issues
@@ -435,8 +436,8 @@ The `docker-compose.yml` file configures:
 
 ### API Key Security
 - **Never commit** `.env` files to version control
-- **Use environment variables** instead of hardcoded keys
-- **Rotate keys regularly** for production use
+- **Claude API key is optional** - Claude CLI handles authentication
+- **Tailscale auth key required** for remote access
 - **Monitor usage** through Anthropic and Tailscale dashboards
 
 ### Network Security

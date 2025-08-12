@@ -52,21 +52,23 @@ check_docker() {
 check_env() {
     if [ ! -f ".env" ]; then
         print_error ".env file not found!"
-        print_info "Please copy env.example to .env and add your API keys:"
+        print_info "Please copy env.example to .env and add your Tailscale auth key:"
         echo "  cp env.example .env"
-        echo "  # Then edit .env with your actual API keys"
+        echo "  # Then edit .env with your Tailscale auth key"
+        echo "  # Claude API key is optional - Claude CLI will prompt for login"
         exit 1
     fi
     
-    # Check for required environment variables
-    if ! grep -q "ANTHROPIC_API_KEY=" .env || grep -q "ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxx" .env; then
-        print_error "ANTHROPIC_API_KEY not set or still has placeholder value in .env"
-        exit 1
-    fi
-    
+    # Check for Tailscale auth key (required for remote access)
     if ! grep -q "TS_AUTHKEY=" .env || grep -q "TS_AUTHKEY=tskey-auth-xxxxxxxx" .env; then
         print_error "TS_AUTHKEY not set or still has placeholder value in .env"
+        print_info "Get your Tailscale auth key from: https://login.tailscale.com/admin/settings/keys"
         exit 1
+    fi
+    
+    # Note: ANTHROPIC_API_KEY is optional - Claude CLI will prompt for login
+    if grep -q "ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxx" .env; then
+        print_info "Note: Claude API key not set - Claude CLI will prompt for login when first used"
     fi
     
     print_status "Environment variables are configured"
