@@ -168,70 +168,122 @@ show_connection_info() {
     # Wait a bit more for Tailscale to connect
     sleep 5
     
-    # Get local IP address
-    LOCAL_IP=$(ifconfig | grep "inet " | grep -v 127.0.0.1 | awk '{print $2}' | head -1)
+    # Get host machine Tailscale IP (IPv4 only)
+    HOST_TAILSCALE_IP=$(tailscale ip -4 2>/dev/null || echo "Not connected")
+    
+    # Get container Tailscale IP (IPv4 only)
+    CONTAINER_TAILSCALE_IP=$(docker exec claude-cli-container tailscale ip -4 2>/dev/null | head -1 || echo "Connecting...")
     
     # Get Docker container IP
-    DOCKER_IP=$(docker inspect claude-cli-container | grep '"IPAddress"' | head -1 | awk -F'"' '{print $4}')
-    
-    # Get Tailscale IP
-    TAILSCALE_IP=$(docker exec claude-cli-container tailscale ip 2>/dev/null | head -1 || echo "Connecting...")
-    
-    # Get Tailscale status
-    TAILSCALE_STATUS=$(docker exec claude-cli-container tailscale status 2>/dev/null | head -1 || echo "Not connected")
-    
-    # Get host machine Tailscale IP
-    HOST_TAILSCALE_IP=$(tailscale ip 2>/dev/null || echo "Not connected")
+    DOCKER_IP=$(docker inspect claude-cli-container 2>/dev/null | grep '"IPAddress"' | head -1 | awk -F'"' '{print $4}' || echo "172.17.0.2")
     
     echo ""
     echo "🎉 Setup Complete!"
     echo ""
-    echo "📋 Connection Information:"
-    echo ""
-    echo "🌐 Local Access (from this machine):"
-            echo "  SSH (Key): ./ssh-claude"
-        echo "  SSH (Password): ./ssh-password localhost"
-    echo "  SSH (Clean): ./ssh-clean"
-    echo "  Web Apps: http://localhost:5300 (Welcome App)"
-    echo "            http://localhost:5301 (React/Node.js)"
-    echo "            http://localhost:5500 (Flask)"
-    echo "            http://localhost:5800 (Django)"
-    echo ""
-    echo "🐳 Docker Network Access:"
-    echo "  SSH: ssh claude@$DOCKER_IP"
-    echo "  Web Apps: http://$DOCKER_IP:3000 (Welcome App)"
-    echo "            http://$DOCKER_IP:3001 (React/Node.js)"
-    echo "            http://$DOCKER_IP:5000 (Flask)"
-    echo "            http://$DOCKER_IP:8000 (Django)"
-    echo ""
-    echo "🔗 Tailscale Network Access (for mobile/remote):"
-    echo "  Host Machine IP: $HOST_TAILSCALE_IP"
-    echo "  Container Status: $TAILSCALE_STATUS"
-    if [ "$TAILSCALE_IP" != "Connecting..." ]; then
-        echo "  Container IP: $TAILSCALE_IP"
-        echo "  SSH (Key): ./ssh-claude --host $HOST_TAILSCALE_IP"
-        echo "  SSH (Password): ./ssh-password $HOST_TAILSCALE_IP"
-        echo "  Web Apps: http://$HOST_TAILSCALE_IP:5300 (Welcome App)"
-        echo "            http://$HOST_TAILSCALE_IP:5301 (React/Node.js)"
-        echo "            http://$HOST_TAILSCALE_IP:5500 (Flask)"
-        echo "            http://$HOST_TAILSCALE_IP:5800 (Django)"
+    echo "🔗 REMOTE ACCESS (Mobile/Remote Devices)"
+    echo "========================================"
+    if [ "$HOST_TAILSCALE_IP" != "Not connected" ]; then
+        echo "✅ Tailscale Connected: $HOST_TAILSCALE_IP"
+        echo ""
+        echo "📱 SSH Access:"
+        echo "  ssh claude@$HOST_TAILSCALE_IP"
+        echo "  Password: claude"
+        echo ""
+        echo "🌐 Web Access:"
+        echo "  Welcome App: http://$HOST_TAILSCALE_IP:5300"
+        echo "  New Apps: http://$HOST_TAILSCALE_IP:5301-5320"
+        echo ""
+        echo "📱 Mobile Setup:"
+        echo "  1. Install Tailscale from App Store"
+        echo "  2. Install Termius SSH client"
+        echo "  3. Connect to: ssh claude@$HOST_TAILSCALE_IP"
+        echo "  4. Password: claude"
     else
-        echo "  ⏳ Container Tailscale is connecting... (check logs: docker-compose logs claude-cli)"
+        echo "❌ Tailscale Not Connected"
+        echo "   Run: tailscale up"
+        echo "   Then restart: docker-compose restart"
     fi
+    
     echo ""
-    echo "📱 Mobile Access:"
-    echo "  1. Install Tailscale from App Store"
-    echo "  2. SSH: Use Termius app with the host IP above"
-    echo "  3. Web: Open Safari and go to http://$HOST_TAILSCALE_IP:5300"
+    echo "💻 LOCAL ACCESS (This Machine)"
+    echo "=============================="
+    echo "SSH: ./ssh-claude"
+    echo "Web: http://localhost:5300"
     echo ""
-    echo "🔧 Useful Commands:"
-    echo "  View logs: docker-compose logs claude-cli"
-    echo "  Stop container: docker-compose down"
-    echo "  Restart container: docker-compose restart"
-    echo "  Check Tailscale: ./scripts/setup-tailscale.sh"
-            echo "  SSH into container: ssh claude@localhost"
+    
+    # Create access.txt file
+    create_access_file "$HOST_TAILSCALE_IP" "$CONTAINER_TAILSCALE_IP" "$DOCKER_IP"
+    
+    echo "📄 Access details saved to: access.txt"
+    echo ""
+    echo "🔧 Quick Commands:"
+    echo "  SSH: ./ssh-claude"
+    echo "  Logs: docker-compose logs claude-cli"
+    echo "  Stop: docker-compose down"
+    echo "  Restart: docker-compose restart"
     echo ""
     echo "🚀 Your Claude CLI Container is ready!"
+}
+
+# Create access.txt file with connection details
+create_access_file() {
+    local HOST_IP="$1"
+    local CONTAINER_IP="$2"
+    local DOCKER_IP="$3"
+    
+    cat > access.txt << EOF
+🚀 Mobile AI Agent - Access Information
+=======================================
+
+🔗 REMOTE ACCESS (Mobile/Remote Devices)
+=======================================
+Host IP: $HOST_IP
+SSH: ssh claude@$HOST_IP
+Password: claude
+
+Web Apps:
+- Welcome App: http://$HOST_IP:5300
+- New Apps: http://$HOST_IP:5301-5320
+- Flask Apps: http://$HOST_IP:5500
+- Django Apps: http://$HOST_IP:5800
+
+📱 Mobile Setup:
+1. Install Tailscale from App Store
+2. Install Termius SSH client
+3. Connect to: ssh claude@$HOST_IP
+4. Password: claude
+
+💻 LOCAL ACCESS (This Machine)
+==============================
+SSH: ./ssh-claude
+Web: http://localhost:5300
+
+🐳 DOCKER NETWORK
+=================
+Container IP: $DOCKER_IP
+SSH: ssh claude@$DOCKER_IP
+Web: http://$DOCKER_IP:3000
+
+🔧 USEFUL COMMANDS
+==================
+SSH Access:
+  ./ssh-claude                    # Local SSH (key-based)
+  ./ssh-password localhost        # Local SSH (password)
+  ./ssh-clean                     # Clean SSH (no warnings)
+
+Container Management:
+  docker-compose logs claude-cli  # View logs
+  docker-compose down             # Stop container
+  docker-compose restart          # Restart container
+  docker-compose up -d            # Start container
+
+PM2 Management:
+  ./ssh-claude "pm2 list"         # List apps
+  ./ssh-claude "pm2 monitor"      # Monitor apps
+  ./ssh-claude "pm2 logs"         # View logs
+
+📄 Generated: $(date)
+EOF
 }
 
 # Main setup process

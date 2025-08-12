@@ -194,3 +194,4 @@ claude-config/
 test-*.js
 test-*.py
 *-test.* 
+access.txt
