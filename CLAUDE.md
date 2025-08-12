@@ -10,7 +10,7 @@ You are running inside a **Docker container** that serves as a **Mobile AI Agent
 - **OS**: Ubuntu 22.04
 - **User**: `claude` (non-root)
 - **Working Directory**: `/home/claude/workspace`
-- **SSH Access**: Available on port 5222
+- **SSH Access**: Available on port 22
 - **Web Hosting**: Multiple ports available for web applications
 
 ## 🌐 **Network Access**
@@ -18,7 +18,7 @@ You are running inside a **Docker container** that serves as a **Mobile AI Agent
 ### **Port Mappings (Host → Container):**
 | Host Port | Container Port | Purpose | Status |
 |-----------|----------------|---------|---------|
-| 5222 | 22 | SSH Access | Always Available |
+| 22 | 22 | SSH Access | Always Available |
 | 5300 | 3000 | Welcome App (PM2 Management) | Always Running |
 | 5301-5320 | 3001-3020 | Additional Apps | Available for New Apps |
 | 5500 | 5000 | Flask Apps | Available for Python Apps |
@@ -248,7 +248,7 @@ pm2 logs react-app
 docker ps
 
 # SSH into container
-ssh claude@localhost -p 5222
+ssh claude@localhost
 
 # View PM2 processes
 pm2 list

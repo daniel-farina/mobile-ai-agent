@@ -109,14 +109,14 @@ setup_ssh_keys() {
 
 # Mobile AI Agent - Auto-accept host keys
 Host localhost
-    Port 5222
+    Port 22
     UserKnownHostsFile /dev/null
     StrictHostKeyChecking accept-new
     GlobalKnownHostsFile /dev/null
     LogLevel ERROR
 
 Host 100.*
-    Port 5222
+    Port 22
     UserKnownHostsFile /dev/null
     StrictHostKeyChecking accept-new
     GlobalKnownHostsFile /dev/null
@@ -189,8 +189,8 @@ show_connection_info() {
     echo "📋 Connection Information:"
     echo ""
     echo "🌐 Local Access (from this machine):"
-    echo "  SSH (Key): ./ssh-claude"
-    echo "  SSH (Password): ./ssh-password localhost 5222"
+            echo "  SSH (Key): ./ssh-claude"
+        echo "  SSH (Password): ./ssh-password localhost"
     echo "  SSH (Clean): ./ssh-clean"
     echo "  Web Apps: http://localhost:5300 (Welcome App)"
     echo "            http://localhost:5301 (React/Node.js)"
@@ -229,7 +229,7 @@ show_connection_info() {
     echo "  Stop container: docker-compose down"
     echo "  Restart container: docker-compose restart"
     echo "  Check Tailscale: ./scripts/setup-tailscale.sh"
-    echo "  SSH into container: ssh claude@localhost -p 5222"
+            echo "  SSH into container: ssh claude@localhost"
     echo ""
     echo "🚀 Your Claude CLI Container is ready!"
 }

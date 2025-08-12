@@ -260,7 +260,7 @@ class WelcomeApp {
                 </div>
                 <div style="margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; font-size: 0.9em;">
                     <strong>📱 Mobile Access:</strong><br>
-                    SSH: <code>ssh claude@${info.hostIP} -p 5222</code><br>
+                    SSH: <code>ssh claude@${info.hostIP}</code><br>
                     Web: <code>http://${info.hostIP}:5300</code>
                 </div>
             </div>

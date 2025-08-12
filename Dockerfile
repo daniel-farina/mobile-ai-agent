@@ -123,7 +123,7 @@ if [[ $- == *i* ]] && [[ -t 0 ]] && [[ -t 1 ]]; then\n\
         echo ""\n\
         echo "Starting Claude CLI with full permissions..."\n\
         echo "Type /exit to return to bash shell"\n\
-        echo "Use: ssh claude@localhost -p 5222 -t bash-shell for direct bash access"\n\
+        echo "Use: ssh claude@localhost -t bash-shell for direct bash access"\n\
         echo ""\n\
         exec claude --dangerously-skip-permissions\n\
     fi\n\

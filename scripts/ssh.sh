@@ -35,7 +35,7 @@ chmod 600 "$SSH_KEY"
 
 # Default values
 HOST="localhost"
-PORT="5222"
+PORT="22"
 USER="claude"
 
 # Parse command line arguments
@@ -60,7 +60,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  --host HOST     SSH host (default: localhost)"
-            echo "  --port PORT     SSH port (default: 5222)"
+            echo "  --port PORT     SSH port (default: 22)"
             echo "  --user USER     SSH user (default: claude)"
             echo "  --help, -h      Show this help message"
             echo ""

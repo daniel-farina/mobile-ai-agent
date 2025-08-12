@@ -118,7 +118,7 @@ pm2 delete app-name
 docker ps | grep claude-cli-container
 
 # SSH into container
-ssh claude@localhost -p 5222
+ssh claude@localhost
 
 # View container logs
 docker-compose logs claude-cli

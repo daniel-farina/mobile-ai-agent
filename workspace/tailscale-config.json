@@ -11,7 +11,7 @@
     "djangoApp": "http://100.82.56.81:5800"
   },
   "sshAccess": {
-    "host": "ssh claude@100.82.56.81 -p 5222",
+    "host": "ssh claude@100.82.56.81",
     "container": null
   }
 }

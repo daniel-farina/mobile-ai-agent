@@ -80,11 +80,11 @@ This script will:
 
 | Access Method | Command |
 |---------------|---------|
-| **Local (Key)** | `./ssh-claude` or `ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222` |
-| **Local (Password)** | `./ssh-password localhost 5222` or `ssh claude@localhost -p 5222` (password: `claude`) |
-| **Remote (Key)** | `./ssh-claude --host 100.82.56.81` or `ssh -i workspace/ssh-keys/id_ed25519 claude@100.82.56.81 -p 5222` |
-| **Remote (Password)** | `./ssh-password 100.82.56.81` or `ssh claude@100.82.56.81 -p 5222` (password: `claude`) |
-| **Mobile** | Use Termius app with `ssh claude@100.82.56.81 -p 5222` (password: `claude`) |
+| **Local (Key)** | `./ssh-claude` or `ssh -i workspace/ssh-keys/id_ed25519 claude@localhost` |
+| **Local (Password)** | `./ssh-password localhost` or `ssh claude@localhost` (password: `claude`) |
+| **Remote (Key)** | `./ssh-claude --host 100.82.56.81` or `ssh -i workspace/ssh-keys/id_ed25519 claude@100.82.56.81` |
+| **Remote (Password)** | `./ssh-password 100.82.56.81` or `ssh claude@100.82.56.81` (password: `claude`) |
+| **Mobile** | Use Termius app with `ssh claude@100.82.56.81` (password: `claude`) |
 
 ## 🔗 How to Connect
 
@@ -106,16 +106,16 @@ This script will:
 #### **Standard SSH Commands**
 ```bash
 # Local access (with warnings)
-ssh -i workspace/ssh-keys/id_ed25519 claude@localhost -p 5222
+ssh -i workspace/ssh-keys/id_ed25519 claude@localhost
 
 # Local access (clean, no warnings)
-ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@localhost -p 5222
+ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@localhost
 
 # Remote access via Tailscale (clean)
-ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@100.64.246.92 -p 5222
+ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@100.64.246.92
 
 # Mobile access (from any device on Tailscale network)
-ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@100.64.246.92 -p 5222
+ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR claude@100.64.246.92
 ```
 
 #### **SSH Key Location**
@@ -134,11 +134,11 @@ ssh -i workspace/ssh-keys/id_ed25519 -o StrictHostKeyChecking=accept-new -o User
 # Simple password-based access
 ./ssh-password                    # Local access
 ./ssh-password 100.64.246.92      # Remote access
-./ssh-password 100.64.246.92 5222 # Custom port
+./ssh-password 100.64.246.92 22   # Custom port
 
 # Standard SSH with password
-ssh claude@localhost -p 5222      # Will prompt for password: claude
-ssh claude@100.64.246.92 -p 5222  # Will prompt for password: claude
+ssh claude@localhost              # Will prompt for password: claude
+ssh claude@100.64.246.92          # Will prompt for password: claude
 ```
 
 ### Web App Access
@@ -155,7 +155,7 @@ http://100.64.246.92:5800  # Django apps
 1. Install **Termius** from App Store
 2. Add new SSH connection:
    - Host: `100.64.246.92`
-   - Port: `5222`
+   - Port: `22`
    - Username: `claude`
    - Authentication: **Password** (easier) or **SSH Key**
    - Password: `claude`
@@ -164,11 +164,11 @@ http://100.64.246.92:5800  # Django apps
 **SSH Commands for Termius:**
 ```bash
 # Password authentication (easier)
-ssh claude@100.64.246.92 -p 5222
+ssh claude@100.64.246.92
 # Password: claude
 
 # SSH key authentication (more secure)
-ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92
 ```
 
 ### Web App Access from iPhone
@@ -184,7 +184,7 @@ ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
 ./ssh-claude --host 100.64.246.92
 
 # Or using standard SSH command
-ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92 -p 5222
+ssh -i workspace/ssh-keys/id_ed25519 claude@100.64.246.92
 
 # Then navigate to workspace
 cd /home/claude/workspace
@@ -518,12 +518,12 @@ If you see "REMOTE HOST IDENTIFICATION HAS CHANGED" warnings:
 **Quick Fix:**
 ```bash
 # Remove old host keys
-ssh-keygen -R "[localhost]:5222"
-ssh-keygen -R "[100.82.56.81]:5222"
+ssh-keygen -R "[localhost]:22"
+ssh-keygen -R "[100.82.56.81]:22"
 
 # Use clean SSH commands
 ./ssh-clean
-./ssh-password localhost 5222
+./ssh-password localhost
 ```
 
 **Prevention:**
@@ -560,7 +560,7 @@ If remote access doesn't work:
 
 2. **Check container Tailscale:**
    ```bash
-   ./ssh-password localhost 5222 "tailscale status"
+   ./ssh-password localhost "tailscale status"
    ```
 
 3. **Add TS_AUTHKEY to .env and restart:**

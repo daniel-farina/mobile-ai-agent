@@ -118,7 +118,7 @@ cat > "$CONFIG_FILE" << EOF
     "djangoApp": "http://$HOST_TAILSCALE_IP:5800"
   },
   "sshAccess": {
-    "host": "ssh claude@$HOST_TAILSCALE_IP -p 5222",
+    "host": "ssh claude@$HOST_TAILSCALE_IP",
     "container": "ssh claude@$CONTAINER_TAILSCALE_IP"
   }
 }
@@ -140,7 +140,7 @@ echo "  Flask Apps: http://$HOST_TAILSCALE_IP:5500"
 echo "  Django Apps: http://$HOST_TAILSCALE_IP:5800"
 echo ""
 echo "🔐 SSH Access:"
-echo "  From mobile: ssh claude@$HOST_TAILSCALE_IP -p 5222"
+echo "  From mobile: ssh claude@$HOST_TAILSCALE_IP"
 echo "  From any device: ssh claude@$CONTAINER_TAILSCALE_IP"
 echo ""
 echo "📋 Quick Commands:"
