@@ -132,6 +132,16 @@ EOF
     # Create SSH host keys directory
     mkdir -p ssh-host-keys
     
+    # Sync CLAUDE.md to claude-config directory
+    print_info "Syncing CLAUDE.md to claude-config directory..."
+    if [ -f "CLAUDE.md" ]; then
+        mkdir -p claude-config
+        cp CLAUDE.md claude-config/CLAUDE.md
+        print_status "CLAUDE.md synced to claude-config directory"
+    else
+        print_warning "CLAUDE.md not found - skipping sync"
+    fi
+    
     print_status "SSH keys configured"
 }
 
